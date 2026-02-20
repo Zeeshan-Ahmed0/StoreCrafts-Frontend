@@ -5,7 +5,7 @@
 
 import type { ThemeConfig, ThemeApiResponse, ThemeFetchOptions } from '../types/theme';
 import { DEFAULT_THEME } from './defaultTheme';
-import { API_BASE_URL, API_ENDPOINTS } from './api-endpoints';
+import { API_BASE_URL, ENDPOINTS } from './api-endpoints';
 
 export class ThemeService {
   private static instance: ThemeService;
@@ -42,7 +42,7 @@ export class ThemeService {
       const finalStoreId = storeId || this.getStoreId();
       
       // Build API endpoint
-      let endpoint = `${this.baseURL}${API_ENDPOINTS.THEME.GET}`;
+      let endpoint = `${this.baseURL}${ENDPOINTS.THEME.GET}`;
       
       // Add store_id query param if available
       if (finalStoreId) {
@@ -144,7 +144,7 @@ export class ThemeService {
     try {
       const storeId = this.getStoreId();
       
-      let endpoint = `${this.baseURL}${API_ENDPOINTS.THEME.UPDATE}`;
+      let endpoint = `${this.baseURL}${ENDPOINTS.THEME.UPDATE}`;
       if (storeId) {
         endpoint += `?store_id=${encodeURIComponent(storeId)}`;
       }

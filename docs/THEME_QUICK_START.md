@@ -217,7 +217,7 @@ getColor('primar');     // ❌ TypeScript Error
 Update `constants/api.ts` if your endpoint is different:
 
 ```ts
-export const API_ENDPOINTS = {
+export const ENDPOINTS = {
   THEME: {
     GET: '/theme',      // ← Change if needed
     UPDATE: '/theme',   // ← Change if needed

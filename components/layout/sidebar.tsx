@@ -107,13 +107,13 @@ export function Sidebar({ session, className }: SidebarProps) {
         <div
             className={cn(
                 "fixed inset-y-0 left-0 z-50 flex h-full flex-col bg-white dark:bg-gray-900 border-r shadow-lg transition-all duration-300 ease-in-out",
-                isExpanded ? "w-64" : "w-[70px]",
+                isExpanded ? "w-64" : "w-17.5",
                 className
             )}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
         >
-            <div className="flex h-[70px] items-center px-4 overflow-hidden shrink-0 transition-all duration-300">
+            <div className="flex h-17.5 items-center px-4 overflow-hidden shrink-0 transition-all duration-300">
                 <div className={cn(
                     "flex items-center justify-center transition-all duration-300",
                     isExpanded ? "w-full" : "w-10"
