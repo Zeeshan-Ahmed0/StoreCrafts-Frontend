@@ -9,7 +9,8 @@ serverOnly();
 
 // Server action for fetching reviews with pagination
 export const listReviewsAction = async (
-  params: ReviewFilterParams = { page: 1, pageSize: 20 }
+  params: ReviewFilterParams = { page: 1, pageSize: 20 },
+  storeSlug?: string
 ): Promise<DataFetchState<Review>> => {
   try {
     const query = new URLSearchParams({
@@ -22,7 +23,7 @@ export const listReviewsAction = async (
       ...(params.order && { order: params.order }),
     });
 
-    const data = (await apiService.get(`${ENDPOINTS.REVIEWS.LIST}?${query}`)) as any;
+    const data = (await apiService.get(`${ENDPOINTS.REVIEWS.LIST(storeSlug)}?${query}`)) as any;
     
     return {
       data: data.data || data,

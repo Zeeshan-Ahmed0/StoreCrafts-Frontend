@@ -27,28 +27,18 @@ export default function NotificationDemo() {
   };
 
   const handleToastLoading = () => {
-    const id = toast.loading('Processing your request...');
+    toast.loading('Processing your request...');
     setTimeout(() => {
-      toast.update(id, {
-        render: 'Done! Your request has been processed.',
-        type: 'success',
-        isLoading: false,
-        autoClose: 3000,
-      });
+      toast.success('Done! Your request has been processed.');
     }, 2000);
   };
 
   const handlePromiseToast = async () => {
-    await toast.promise(
-      new Promise((resolve) => {
-        setTimeout(() => resolve('Completed'), 2000);
-      }),
-      {
-        pending: 'Loading your data...',
-        success: 'Data loaded successfully!',
-        error: 'Failed to load data',
-      }
-    );
+    toast.loading('Loading your data...');
+    await new Promise((resolve) => {
+      setTimeout(() => resolve('Completed'), 2000);
+    });
+    toast.success('Data loaded successfully!');
   };
 
   // Confirmation Handlers

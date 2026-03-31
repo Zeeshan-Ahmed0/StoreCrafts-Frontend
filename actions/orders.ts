@@ -7,7 +7,8 @@ import { Order, OrderFilterParams, DataFetchState } from '@/types';
 
 serverOnly();
 export const listOrdersAction = async (
-  params: OrderFilterParams = { page: 1, pageSize: 20 }
+  params: OrderFilterParams = { page: 1, pageSize: 20 },
+  storeSlug?: string
 ): Promise<DataFetchState<Order>> => {
   try {
     const query = new URLSearchParams({
@@ -20,7 +21,7 @@ export const listOrdersAction = async (
       ...(params.order && { order: params.order }),
     });
 
-    const data = (await apiService.get(`${ENDPOINTS.ORDERS.LIST}?${query}`)) as any;
+    const data = (await apiService.get(`${ENDPOINTS.ORDERS.LIST(storeSlug)}?${query}`)) as any;
     
     return {
       data: data.data || data,

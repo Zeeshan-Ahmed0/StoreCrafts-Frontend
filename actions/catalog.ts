@@ -9,7 +9,8 @@ serverOnly();
 
 // Server action for fetching products with pagination
 export const getProductsAction = async (
-  params: ProductFilterParams = { page: 1, pageSize: 20 }
+  params: ProductFilterParams = { page: 1, pageSize: 20 },
+  storeSlug?: string
 ): Promise<DataFetchState<Product>> => {
   try {
     const query = new URLSearchParams({
@@ -22,7 +23,7 @@ export const getProductsAction = async (
       ...(params.order && { order: params.order }),
     });
 
-    const data = (await apiService.get(`${ENDPOINTS.PRODUCTS.LIST}?${query}`)) as any;
+    const data = (await apiService.get(`${ENDPOINTS.PRODUCTS.LIST(storeSlug)}?${query}`)) as any;
     
     return {
       data: data.data || data,
@@ -38,7 +39,8 @@ export const getProductsAction = async (
 
 // Server action for fetching categories with pagination
 export const getCategoriesAction = async (
-  params: CategoryFilterParams = { page: 1, pageSize: 20 }
+  params: CategoryFilterParams = { page: 1, pageSize: 20 },
+  storeSlug?: string
 ): Promise<DataFetchState<Category>> => {
   try {
     const query = new URLSearchParams({
@@ -49,7 +51,7 @@ export const getCategoriesAction = async (
       ...(params.order && { order: params.order }),
     });
 
-    const data = (await apiService.get(`${ENDPOINTS.CATEGORIES.LIST}?${query}`)) as any;
+    const data = (await apiService.get(`${ENDPOINTS.CATEGORIES.LIST(storeSlug)}?${query}`)) as any;
     
     return {
       data: data.data || data,
@@ -74,9 +76,10 @@ export const getProductAction = async (id: string): Promise<Product> => {
 };
 
 // Client-compatible action for creating category (can be called from client components)
-export const createCategoryAction = async (payload: Partial<Category>) => {
+export const createCategoryAction = async (payload: Partial<Category>, storeSlug?: string) => {
   try {
-    const data = await apiService.post(ENDPOINTS.CATEGORIES.CREATE, JSON.stringify(payload));
+    const endpoint = ENDPOINTS.CATEGORIES.CREATE(storeSlug);
+    const data = await apiService.post(endpoint, JSON.stringify(payload));
     return { success: true, data } as any;
   } catch (error: any) {
     console.error('Error creating category:', error);
@@ -85,9 +88,10 @@ export const createCategoryAction = async (payload: Partial<Category>) => {
 };
 
 // Client-compatible action for updating category
-export const updateCategoryAction = async (id: string | number, payload: Partial<Category>) => {
+export const updateCategoryAction = async (id: string | number, payload: Partial<Category>, storeSlug?: string) => {
   try {
-    const data = await apiService.put(ENDPOINTS.CATEGORIES.UPDATE(String(id)), JSON.stringify(payload));
+    const endpoint = ENDPOINTS.CATEGORIES.UPDATE(String(id), storeSlug);
+    const data = await apiService.put(endpoint, JSON.stringify(payload));
     return { success: true, data } as any;
   } catch (error: any) {
     console.error('Error updating category:', error);
@@ -96,9 +100,10 @@ export const updateCategoryAction = async (id: string | number, payload: Partial
 };
 
 // Client-compatible action for deleting category
-export const deleteCategoryAction = async (id: string | number) => {
+export const deleteCategoryAction = async (id: string | number, storeSlug?: string) => {
   try {
-    await apiService.delete(ENDPOINTS.CATEGORIES.DELETE(String(id)));
+    const endpoint = ENDPOINTS.CATEGORIES.DELETE(String(id), storeSlug);
+    await apiService.delete(endpoint);
     return { success: true, data: null } as any;
   } catch (error: any) {
     console.error('Error deleting category:', error);
@@ -107,9 +112,10 @@ export const deleteCategoryAction = async (id: string | number) => {
 };
 
 // Client-compatible action for creating product
-export const createProductAction = async (payload: Partial<Product>) => {
+export const createProductAction = async (payload: Partial<Product>, storeSlug?: string) => {
   try {
-    const data = await apiService.post(ENDPOINTS.PRODUCTS.CREATE, JSON.stringify(payload));
+    const endpoint = ENDPOINTS.PRODUCTS.CREATE(storeSlug);
+    const data = await apiService.post(endpoint, JSON.stringify(payload));
     return { success: true, data } as any;
   } catch (error: any) {
     console.error('Error creating product:', error);
@@ -118,9 +124,10 @@ export const createProductAction = async (payload: Partial<Product>) => {
 };
 
 // Client-compatible action for updating product
-export const updateProductAction = async (id: string | number, payload: Partial<Product>) => {
+export const updateProductAction = async (id: string | number, payload: Partial<Product>, storeSlug?: string) => {
   try {
-    const data = await apiService.put(ENDPOINTS.PRODUCTS.UPDATE(String(id)), JSON.stringify(payload));
+    const endpoint = ENDPOINTS.PRODUCTS.UPDATE(String(id), storeSlug);
+    const data = await apiService.put(endpoint, JSON.stringify(payload));
     return { success: true, data } as any;
   } catch (error: any) {
     console.error('Error updating product:', error);
@@ -129,9 +136,10 @@ export const updateProductAction = async (id: string | number, payload: Partial<
 };
 
 // Client-compatible action for deleting product
-export const deleteProductAction = async (id: string | number) => {
+export const deleteProductAction = async (id: string | number, storeSlug?: string) => {
   try {
-    await apiService.delete(ENDPOINTS.PRODUCTS.DELETE(String(id)));
+    const endpoint = ENDPOINTS.PRODUCTS.DELETE(String(id), storeSlug);
+    await apiService.delete(endpoint);
     return { success: true, data: null } as any;
   } catch (error: any) {
     console.error('Error deleting product:', error);

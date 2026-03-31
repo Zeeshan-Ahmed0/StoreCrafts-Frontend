@@ -1,0 +1,44 @@
+import { Suspense } from 'react';
+import { parseSearchParams } from '@/lib/server-only';
+import { CouponFilterParams } from '@/types';
+import { listCouponsAction } from '@/actions/coupons';
+import { CouponsDataTable } from '@/components/admin/CouponsDataTable';
+import { CouponsLoadingFallback } from '@/components/admin/CouponsLoadingFallback';
+
+interface CouponsPageProps {
+  searchParams: Record<string, string | string[] | undefined>;
+  params: { storename: string };
+}
+
+async function CouponsContent({ searchParams, params }: CouponsPageProps) {
+  const { storename } = params;
+
+  // Parse search parameters
+  const parsedParams = parseSearchParams(searchParams);
+
+  // Prepare filter parameters
+  const couponParams: CouponFilterParams = {
+    page: parsedParams.page,
+    pageSize: parsedParams.pageSize,
+    search: parsedParams.search,
+    sort: parsedParams.sort,
+    order: parsedParams.order,
+  };
+
+  // Fetch data on the server with store context
+  const couponsData = await listCouponsAction(couponParams, storename);
+
+  return (
+    <CouponsDataTable
+      initialData={couponsData}
+    />
+  );
+}
+
+export default function CouponsPage(props: CouponsPageProps) {
+  return (
+    <Suspense fallback={<CouponsLoadingFallback />}>
+      <CouponsContent {...props} />
+    </Suspense>
+  );
+}

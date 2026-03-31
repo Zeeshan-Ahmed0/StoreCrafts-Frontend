@@ -2,19 +2,11 @@ import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 import { authConfig } from "./auth.config"
 
-function calculateSecretHash(username: string, clientId: string, clientSecret: string): string {
-    return crypto
-        .createHmac("sha256", clientSecret)
-        .update(username + clientId)
-        .digest("base64")
-}
-
 export const { handlers, signIn, signOut, auth } = NextAuth({
     ...authConfig,
-    trustHost: true, // Explicitly set here as well for production
     providers: [
         Credentials({
-            name: "Cognito",
+            name: "StoreCrafts",
             credentials: {
                 email: { label: "Email", type: "email" },
                 password: { label: "Password", type: "password" },
@@ -22,35 +14,35 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             async authorize(credentials) {
                 if (!credentials?.email || !credentials?.password) return null
 
-                const clientId = process.env.AUTH_COGNITO_ID!
-                const clientSecret = process.env.AUTH_COGNITO_SECRET!
-                const username = credentials.email as string
-
-                const params = {
-                    AuthFlow: "USER_PASSWORD_AUTH" as const,
-                    ClientId: clientId,
-                    AuthParameters: {
-                        USERNAME: username,
-                        PASSWORD: credentials.password as string,
-                        SECRET_HASH: calculateSecretHash(username, clientId, clientSecret),
-                    },
-                }
-
                 try {
-                    const command = new InitiateAuthCommand(params)
-                    const response = await cognitoClient.send(command)
+                    // Call backend API to authenticate
+                    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            email: credentials.email,
+                            password: credentials.password,
+                        }),
+                    })
 
-                    if (response.AuthenticationResult) {
+                    if (!response.ok) return null
+
+                    const data = await response.json()
+
+                    if (data.token) {
                         return {
-                            id: response.AuthenticationResult.AccessToken || "user-id", // Ideally decode ID token for sub
-                            email: username,
-                            accessToken: response.AuthenticationResult.AccessToken,
-                            idToken: response.AuthenticationResult.IdToken,
+                            id: data.user?.id || credentials.email,
+                            email: data.user?.email || credentials.email,
+                            role: data.user?.role || "customer",
+                            accessToken: data.token,
+                            storeId: data.user?.storeId,
                         }
                     }
                     return null
                 } catch (error) {
-                    console.error("Cognito Login Error:", JSON.stringify(error, null, 2))
+                    console.error("Auth Error:", error)
                     return null
                 }
             },

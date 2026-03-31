@@ -9,7 +9,8 @@ serverOnly();
 
 // Server action for fetching coupons with pagination
 export const listCouponsAction = async (
-  params: CouponFilterParams = { page: 1, pageSize: 20 }
+  params: CouponFilterParams = { page: 1, pageSize: 20 },
+  storeSlug?: string
 ): Promise<DataFetchState<Coupon>> => {
   try {
     const query = new URLSearchParams({
@@ -21,7 +22,7 @@ export const listCouponsAction = async (
       ...(params.order && { order: params.order }),
     });
 
-    const data = (await apiService.get(`${ENDPOINTS.COUPONS.LIST}?${query}`)) as any;
+    const data = (await apiService.get(`${ENDPOINTS.COUPONS.LIST(storeSlug)}?${query}`)) as any;
     
     return {
       data: data.data || data,
@@ -46,9 +47,10 @@ export const getCouponAction = async (id: string): Promise<Coupon> => {
 };
 
 // Client-compatible action for creating coupon
-export const createCouponAction = async (payload: Partial<Coupon>) => {
+export const createCouponAction = async (payload: Partial<Coupon>, storeSlug?: string) => {
   try {
-    const data = await apiService.post(ENDPOINTS.COUPONS.CREATE, JSON.stringify(payload));
+    const endpoint = ENDPOINTS.COUPONS.CREATE(storeSlug);
+    const data = await apiService.post(endpoint, JSON.stringify(payload));
     return { success: true, data } as any;
   } catch (error: any) {
     console.error('Error creating coupon:', error);
@@ -57,9 +59,10 @@ export const createCouponAction = async (payload: Partial<Coupon>) => {
 };
 
 // Client-compatible action for updating coupon
-export const updateCouponAction = async (id: string, payload: Partial<Coupon>) => {
+export const updateCouponAction = async (id: string, payload: Partial<Coupon>, storeSlug?: string) => {
   try {
-    const data = await apiService.put(ENDPOINTS.COUPONS.UPDATE(id), JSON.stringify(payload));
+    const endpoint = ENDPOINTS.COUPONS.UPDATE(id, storeSlug);
+    const data = await apiService.put(endpoint, JSON.stringify(payload));
     return { success: true, data } as any;
   } catch (error: any) {
     console.error('Error updating coupon:', error);
@@ -68,9 +71,10 @@ export const updateCouponAction = async (id: string, payload: Partial<Coupon>) =
 };
 
 // Client-compatible action for deleting coupon
-export const deleteCouponAction = async (id: string) => {
+export const deleteCouponAction = async (id: string, storeSlug?: string) => {
   try {
-    await apiService.delete(ENDPOINTS.COUPONS.DELETE(id));
+    const endpoint = ENDPOINTS.COUPONS.DELETE(id, storeSlug);
+    await apiService.delete(endpoint);
     return { success: true, data: null } as any;
   } catch (error: any) {
     console.error('Error deleting coupon:', error);

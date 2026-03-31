@@ -40,7 +40,7 @@ export function AdminThemeManager({ onThemeChange }: AdminThemeManagerProps) {
     setIsRefreshing(true);
     setSuccessMessage(null);
     try {
-      await refreshTheme({ forceRefresh: true });
+      await refreshTheme();
       setSuccessMessage('Theme refreshed successfully');
     } catch (err) {
       console.error('Failed to refresh theme:', err);
@@ -187,13 +187,13 @@ export function AdminThemeManager({ onThemeChange }: AdminThemeManagerProps) {
       {/* Color Palette */}
       <div className="bg-surface border border-border rounded-lg p-6">
         <h3 className="text-lg font-bold text-text mb-4">Color Palette</h3>
-        <ColorPaletteGrid colors={theme.colors} />
+        <ColorPaletteGrid colors={theme.colors as unknown as Record<string, { light: string; dark: string; }>} />
       </div>
 
       {/* Color Details */}
       <div className="bg-surface border border-border rounded-lg p-6">
         <h3 className="text-lg font-bold text-text mb-4">Detailed Colors</h3>
-        <ColorDetailsList colors={theme.colors} isDarkMode={theme.isDarkMode} />
+        <ColorDetailsList colors={theme.colors as unknown as Record<string, { light: string; dark: string; }>} isDarkMode={theme.isDarkMode ?? false} />
       </div>
     </div>
   );

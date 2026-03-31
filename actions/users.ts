@@ -9,7 +9,8 @@ serverOnly();
 
 // Server action for fetching users with pagination
 export const listUsersAction = async (
-  params: UserFilterParams = { page: 1, pageSize: 20 }
+  params: UserFilterParams = { page: 1, pageSize: 20 },
+  storeSlug?: string
 ): Promise<DataFetchState<StoreUser>> => {
   try {
     const query = new URLSearchParams({
@@ -22,7 +23,7 @@ export const listUsersAction = async (
       ...(params.order && { order: params.order }),
     });
 
-    const data = (await apiService.get(`${ENDPOINTS.USERS.LIST}?${query}`)) as any;
+    const data = (await apiService.get(`${ENDPOINTS.USERS.LIST(storeSlug)}?${query}`)) as any;
     
     return {
       data: data.data || data,
@@ -47,9 +48,10 @@ export const getUserAction = async (id: string): Promise<StoreUser> => {
 };
 
 // Client-compatible action for creating user
-export const createUserAction = async (payload: Partial<StoreUser>) => {
+export const createUserAction = async (payload: Partial<StoreUser>, storeSlug?: string) => {
   try {
-    const data = await apiService.post(ENDPOINTS.USERS.CREATE, JSON.stringify(payload));
+    const endpoint = ENDPOINTS.USERS.CREATE(storeSlug);
+    const data = await apiService.post(endpoint, JSON.stringify(payload));
     return { success: true, data } as any;
   } catch (error: any) {
     console.error('Error creating user:', error);
@@ -58,9 +60,10 @@ export const createUserAction = async (payload: Partial<StoreUser>) => {
 };
 
 // Client-compatible action for updating user
-export const updateUserAction = async (id: string, payload: Partial<StoreUser>) => {
+export const updateUserAction = async (id: string, payload: Partial<StoreUser>, storeSlug?: string) => {
   try {
-    const data = await apiService.put(ENDPOINTS.USERS.UPDATE(id), JSON.stringify(payload));
+    const endpoint = ENDPOINTS.USERS.UPDATE(id, storeSlug);
+    const data = await apiService.put(endpoint, JSON.stringify(payload));
     return { success: true, data } as any;
   } catch (error: any) {
     console.error('Error updating user:', error);
@@ -69,9 +72,10 @@ export const updateUserAction = async (id: string, payload: Partial<StoreUser>) 
 };
 
 // Client-compatible action for deleting user
-export const deleteUserAction = async (id: string) => {
+export const deleteUserAction = async (id: string, storeSlug?: string) => {
   try {
-    await apiService.delete(ENDPOINTS.USERS.DELETE(id));
+    const endpoint = ENDPOINTS.USERS.DELETE(id, storeSlug);
+    await apiService.delete(endpoint);
     return { success: true, data: null } as any;
   } catch (error: any) {
     console.error('Error deleting user:', error);
